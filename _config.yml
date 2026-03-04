@@ -3,3 +3,7 @@ description: |
   <p>Trying out the GitHub test page for the causal educational tool</p>
 baseurl: ""
 url: "https://causal-educational-tool.github.io"
+
+remote_theme: jekyll-theme-minimal-mistakes
+plugins:
+  - jekyll-remote-theme
