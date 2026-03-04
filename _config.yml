@@ -4,6 +4,6 @@ description: |
 baseurl: ""
 url: "https://causal-educational-tool.github.io"
 
-remote_theme: jekyll-theme-minimal-mistakes
+theme: jekyll-theme-minimal
 plugins:
-  - jekyll-remote-theme
+  - jekyll-feed
