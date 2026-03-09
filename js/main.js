@@ -12,19 +12,17 @@ const learnSubmenu = document.getElementById('learnSubmenu');
 
 learnToggle.addEventListener('click', () => {
   learnSubmenu.classList.toggle('hidden');
-
-  // Instead of setting style.width, toggle a class
   sidebar.classList.toggle('w-64', !learnSubmenu.classList.contains('hidden'));
   sidebar.classList.toggle('w-[140px]', learnSubmenu.classList.contains('hidden'));
 });
 
-// ===== Scroll-based image switching for side pages (optional) =====
+// ===== Scroll-based image and paragraph highlighting =====
 const topics = document.querySelectorAll('.topic');
 const sideImage = document.getElementById('sideImage');
 const imageContainer = document.getElementById('imageContainer');
 const textContent = document.getElementById('textContent');
 
-if (topics.length && sideImage) { // Only run on side pages
+if (topics.length && sideImage) {
   const images = [
     'assets/test.png',
     'assets/test2.png',
@@ -36,14 +34,24 @@ if (topics.length && sideImage) { // Only run on side pages
   let currentImageIndex = 0;
 
   window.addEventListener('scroll', () => {
+    let minDistance = Infinity;
     let newIndex = 0;
+
     topics.forEach((topic, index) => {
       const rect = topic.getBoundingClientRect();
-      if (rect.top < window.innerHeight / 2) {
+      const distance = Math.abs(rect.top + rect.height / 2 - window.innerHeight / 2);
+      if (distance < minDistance) {
+        minDistance = distance;
         newIndex = index;
       }
     });
 
+    // Update active paragraph
+    topics.forEach((topic, index) => {
+      topic.classList.toggle('active-topic', index === newIndex);
+    });
+
+    // Update right-side image if changed
     if (newIndex !== currentImageIndex) {
       sideImage.style.opacity = 0;
       setTimeout(() => {
@@ -53,20 +61,17 @@ if (topics.length && sideImage) { // Only run on side pages
       }, 200);
     }
 
-    // Expand/shrink image width based on first topic
-    const firstTopicRect = topics[0].getBoundingClientRect();
-    if (firstTopicRect.top < window.innerHeight / 2) {
-      imageContainer.classList.remove('md:w-1/3');
+    // Expand image container / shrink text
+    if (currentImageIndex === 0) {
+      imageContainer.classList.remove('md:w-2/3');
       imageContainer.classList.add('md:w-1/2');
-
-      textContent.classList.remove('md:w-2/3');
+      textContent.classList.remove('md:w-1/3');
       textContent.classList.add('md:w-1/2');
     } else {
       imageContainer.classList.remove('md:w-1/2');
-      imageContainer.classList.add('md:w-1/3');
-
+      imageContainer.classList.add('md:w-2/3');
       textContent.classList.remove('md:w-1/2');
-      textContent.classList.add('md:w-2/3');
+      textContent.classList.add('md:w-1/3');
     }
   });
 }
