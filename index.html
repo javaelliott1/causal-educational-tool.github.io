@@ -4,15 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Interactive Stats Lab</title>
-  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Font Awesome CDN for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+  <style>
+    .card img {
+      transition: transform 0.3s ease, filter 0.3s ease;
+    }
+    .card:hover img {
+      transform: scale(1.05);
+      filter: brightness(1.1);
+    }
+  </style>
 </head>
-<body class="flex h-screen font-sans">
+<body class="flex font-sans">
 
   <!-- Sidebar -->
-  <aside id="sidebar" class="bg-gray-800 text-white p-4 flex-shrink-0 transition-all duration-300 w-[140px] hover:w-64">
+  <aside id="sidebar" class="bg-gray-800 text-white p-4 flex-shrink-0 w-[140px] hover:w-64 sticky top-0 h-screen">
     <h2 class="text-2xl font-bold mb-6 hidden md:block">Menu</h2>
     <ul>
       <li class="mb-2">
@@ -22,7 +29,6 @@
         </a>
       </li>
 
-      <!-- Learn section -->
       <li class="mb-2">
         <button id="learnToggle" class="flex items-center w-full text-left py-2 px-2 rounded hover:bg-gray-700">
           <i class="fa-solid fa-book w-6 text-center"></i>
@@ -46,23 +52,76 @@
 
   <!-- Main content -->
   <main class="flex-1 p-6 overflow-auto relative">
+
     <!-- Persistent Show Menu Button -->
     <button id="showSidebar" class="fixed top-4 right-4 z-50 px-3 py-1 bg-gray-400 text-white rounded hover:bg-gray-500">
       ☰ Menu
     </button>
 
-    <section id="home">
-      <h1 class="text-3xl font-bold mb-4">Welcome!</h1>
-      <p class="text-gray-700 mb-4">
-        This is the Interactive Stats Lab. Click any page in the sidebar to read more.
-      </p>
-      <p class="text-gray-700">
-        Later, you can expand this site with interactive analysis tools or quizzes.
+    <!-- Welcome Header -->
+    <section class="mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold mb-6">Welcome!</h1>
+      <p class="text-lg md:text-xl text-gray-700 mb-8">
+        This is the Interactive Stats Lab. Explore our lessons and analysis tools below.
       </p>
     </section>
+
+    <!-- Image Links Grid -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      
+      <a href="bart.html" class="card block bg-white rounded shadow hover:shadow-lg overflow-hidden">
+        <img src="assets/test.png" alt="BART" class="w-full h-48 object-cover">
+        <div class="p-4">
+          <h2 class="font-bold text-lg">BART and Causal Inference</h2>
+          <p class="text-gray-600 text-sm mt-2">Learn about Bayesian Additive Regression Trees and causal modeling.</p>
+        </div>
+      </a>
+
+      <a href="group.html" class="card block bg-white rounded shadow hover:shadow-lg overflow-hidden">
+        <img src="assets/test2.png" alt="CATE vs SATE vs PATE" class="w-full h-48 object-cover">
+        <div class="p-4">
+          <h2 class="font-bold text-lg">Individual, Group, and Population Effects</h2>
+          <p class="text-gray-600 text-sm mt-2">Understand how effects differ across levels of analysis.</p>
+        </div>
+      </a>
+
+      <a href="language.html" class="card block bg-white rounded shadow hover:shadow-lg overflow-hidden">
+        <img src="assets/test3.png" alt="Predictive vs Causal" class="w-full h-48 object-cover">
+        <div class="p-4">
+          <h2 class="font-bold text-lg">Predictive vs. Causal Language</h2>
+          <p class="text-gray-600 text-sm mt-2">Explore the differences between predictive and causal statements in data science.</p>
+        </div>
+      </a>
+
+      <!-- NEW EXAMPLE CARDS -->
+      <div class="card block bg-white rounded shadow overflow-hidden">
+        <img src="assets/test4.png" alt="Example 1" class="w-full h-48 object-cover">
+        <div class="p-4">
+          <h2 class="font-bold text-lg">Example Card 1</h2>
+          <p class="text-gray-600 text-sm mt-2">This is a sample card for demonstration purposes. It does not link anywhere.</p>
+        </div>
+      </div>
+
+      <div class="card block bg-white rounded shadow overflow-hidden">
+        <img src="assets/test5.png" alt="Example 2" class="w-full h-48 object-cover">
+        <div class="p-4">
+          <h2 class="font-bold text-lg">Example Card 2</h2>
+          <p class="text-gray-600 text-sm mt-2">Another placeholder card using the same image set for layout purposes.</p>
+        </div>
+      </div>
+
+      <div class="card block bg-white rounded shadow overflow-hidden">
+        <img src="assets/test.png" alt="Example 3" class="w-full h-48 object-cover">
+        <div class="p-4">
+          <h2 class="font-bold text-lg">Example Card 3</h2>
+          <p class="text-gray-600 text-sm mt-2">This card is purely illustrative and does not redirect the user.</p>
+        </div>
+      </div>
+
+    </section>
+
   </main>
 
-  <!-- JS -->
   <script src="js/main.js"></script>
 </body>
 </html>
