@@ -3,16 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interactive Stats Lab</title>
-  <!-- Tailwind CDN -->
+  <title>Analyze - Interactive Stats Lab</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Font Awesome CDN for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <style>
+    .card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.12); }
+    #visualizationContainer { position: sticky; top: 20px; }
+    #visualizationContent {
+      max-height: 400px; /* limits height */
+      overflow: auto;    /* scrolls if content exceeds */
+      border: 1px solid #ccc;
+      border-radius: 0.25rem;
+      background-color: #f9fafb;
+      padding: 0.5rem;
+    }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; font-size: 0.875rem; }
+    th { background-color: #f3f3f3; }
+  </style>
 </head>
-<body class="flex h-screen font-sans">
+<body class="flex font-sans">
 
   <!-- Sidebar -->
-  <aside id="sidebar" class="bg-gray-800 text-white p-4 flex-shrink-0 transition-all duration-300 w-[140px] hover:w-64">
+  <aside id="sidebar" class="bg-gray-800 text-white p-4 flex-shrink-0 w-[140px] hover:w-64 sticky top-0 h-screen transition-all duration-300">
     <h2 class="text-2xl font-bold mb-6 hidden md:block">Menu</h2>
     <ul>
       <li class="mb-2">
@@ -22,7 +37,6 @@
         </a>
       </li>
 
-      <!-- Learn section -->
       <li class="mb-2">
         <button id="learnToggle" class="flex items-center w-full text-left py-2 px-2 rounded hover:bg-gray-700">
           <i class="fa-solid fa-book w-6 text-center"></i>
@@ -36,7 +50,7 @@
       </li>
 
       <li>
-        <a href="analyze.html" class="flex items-center py-2 px-2 rounded hover:bg-gray-700">
+        <a href="analyze.html" class="flex items-center py-2 px-2 rounded hover:bg-gray-700 bg-gray-700">
           <i class="fa-solid fa-magnifying-glass w-6 text-center"></i>
           <span class="ml-2 hidden md:inline">Analyze</span>
         </a>
@@ -46,24 +60,133 @@
 
   <!-- Main content -->
   <main class="flex-1 p-6 overflow-auto relative">
-    <!-- Persistent Show Menu Button -->
+
     <button id="showSidebar" class="fixed top-4 right-4 z-50 px-3 py-1 bg-gray-400 text-white rounded hover:bg-gray-500">
       ☰ Menu
     </button>
 
-    <section id="home">
-      <h1 class="text-3xl font-bold mb-4">Analyze Your Data</h1>
-      <p class="text-gray-700 mb-4">
-        Proof-of-thought page
-      </p>
-      <p class="text-gray-700">
-        Should have data load button, and do an analysis on that or a fake one. 
-        Then show interactive dashboard.
+    <section class="mb-8">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">Analyze Your Data</h1>
+      <p class="text-lg md:text-xl text-gray-700">
+        Upload a dataset or use our example Lalonde dataset. The table will appear automatically.
       </p>
     </section>
+
+    <section class="flex flex-col md:flex-row gap-6">
+
+      <!-- Data import card -->
+      <div class="md:flex-1 card bg-white rounded shadow p-6">
+        <h2 class="text-xl font-bold mb-4">Data Import</h2>
+        <p class="text-gray-700 mb-4">Rectangular, wide-format data. Supported file types: .csv, .txt, .xlsx, .sav, .Rdata/.rds, .dta</p>
+
+        <label class="block mb-4">
+          <span class="text-gray-700">Choose file:</span>
+          <input type="file" id="fileInput" accept=".csv,.txt,.xlsx,.sav,.Rdata,.rds,.dta" class="mt-1 block w-full border border-gray-300 rounded p-2">
+        </label>
+
+        <label class="flex items-center gap-2 mb-2">
+          <input type="checkbox" id="headerCheckbox" class="form-checkbox" checked>
+          <span>Data contains a header row</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" id="lalondeCheckbox" class="form-checkbox">
+          <span>Use Lalonde test data</span>
+        </label>
+      </div>
+
+      <!-- Visualization card -->
+      <div id="visualizationContainer" class="md:w-1/2 max-w-[600px] card bg-white rounded shadow p-6">
+        <h2 class="text-xl font-bold mb-4">Data Visualization</h2>
+        <div id="visualizationContent" class="mt-4 min-h-[200px]">
+          <p class="text-gray-400 text-center mt-12">No data loaded yet.</p>
+        </div>
+      </div>
+
+    </section>
+
   </main>
 
-  <!-- JS -->
-  <script src="js/main.js"></script>
+  <script>
+    // Sidebar toggle
+    const sidebar = document.getElementById('sidebar');
+    const showBtn = document.getElementById('showSidebar');
+    const learnToggle = document.getElementById('learnToggle');
+    const learnSubmenu = document.getElementById('learnSubmenu');
+    showBtn.addEventListener('click', () => sidebar.classList.toggle('-translate-x-full'));
+    learnToggle.addEventListener('click', () => {
+      learnSubmenu.classList.toggle('hidden');
+      sidebar.style.width = learnSubmenu.classList.contains('hidden') ? '140px' : '16rem';
+    });
+
+    const fileInput = document.getElementById('fileInput');
+    const headerCheckbox = document.getElementById('headerCheckbox');
+    const lalondeCheckbox = document.getElementById('lalondeCheckbox');
+    const visualizationContent = document.getElementById('visualizationContent');
+
+    function renderTable(data) {
+      if (!data || data.length === 0) {
+        visualizationContent.innerHTML = '<p class="text-gray-400 text-center mt-12">No data available.</p>';
+        return;
+      }
+
+      let table = '<div style="max-height:350px; overflow:auto;"><table class="w-full"><thead><tr>';
+      data[0].forEach(header => table += `<th>${header}</th>`);
+      table += '</tr></thead><tbody>';
+
+      data.slice(1).forEach(row => {
+        table += '<tr>';
+        row.forEach(cell => table += `<td>${cell}</td>`);
+        table += '</tr>';
+      });
+      table += '</tbody></table></div>';
+      visualizationContent.innerHTML = table;
+    }
+
+    function loadLalonde() {
+      Papa.parse('assets/lalonde.csv', {
+        download: true,
+        header: headerCheckbox.checked,
+        complete: function(results) {
+          const data = headerCheckbox.checked
+            ? [results.meta.fields].concat(results.data.map(Object.values))
+            : results.data;
+          renderTable(data);
+        },
+        error: function(err) {
+          visualizationContent.innerHTML = `<p class="text-red-500 text-center mt-12">Failed to load Lalonde data: ${err}</p>`;
+        }
+      });
+    }
+
+    lalondeCheckbox.addEventListener('change', () => {
+      if (lalondeCheckbox.checked) {
+        fileInput.value = '';
+        renderTable([]);
+        loadLalonde();
+      } else {
+        visualizationContent.innerHTML = '<p class="text-gray-400 text-center mt-12">No data loaded yet.</p>';
+      }
+    });
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length === 0) return;
+      lalondeCheckbox.checked = false;
+      Papa.parse(fileInput.files[0], {
+        header: headerCheckbox.checked,
+        complete: function(results) {
+          const data = headerCheckbox.checked
+            ? [results.meta.fields].concat(results.data.map(Object.values))
+            : results.data;
+          renderTable(data);
+        }
+      });
+    });
+
+    headerCheckbox.addEventListener('change', () => {
+      if (lalondeCheckbox.checked) loadLalonde();
+      else if (fileInput.files.length > 0) fileInput.dispatchEvent(new Event('change'));
+    });
+  </script>
+
 </body>
 </html>
