@@ -20,50 +20,60 @@ document.addEventListener('DOMContentLoaded', () => {
   // ===== Scroll-based image and paragraph highlighting =====
   const topics = document.querySelectorAll('.topic');
   const sideImage = document.getElementById('sideImage');
-  const imageContainer = document.getElementById('imageContainer');
-  const textContent = document.getElementById('textContent');
 
   if (topics.length && sideImage) {
-    const images = [
-      'assets/test.png',
-      'assets/test2.png',
-      'assets/test3.png',
-      'assets/test4.png',
-      'assets/test5.png'
-    ];
 
-    let currentImageIndex = 0;
+    // ✅ PRELOAD IMAGES FROM data-image ATTRIBUTES
+    const imageSet = new Set();
+    topics.forEach(topic => {
+      const img = topic.getAttribute('data-image');
+      if (img) imageSet.add(img);
+    });
+
+    imageSet.forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+
+    let currentImage = sideImage.getAttribute('src');
 
     function updateHighlight() {
       let minDistance = Infinity;
-      let newIndex = 0;
+      let activeTopic = null;
 
-      topics.forEach((topic, index) => {
+      topics.forEach((topic) => {
         const rect = topic.getBoundingClientRect();
         const distance = Math.abs(rect.top + rect.height / 2 - window.innerHeight / 2);
+
         if (distance < minDistance) {
           minDistance = distance;
-          newIndex = index;
+          activeTopic = topic;
         }
       });
 
       // Highlight active paragraph
-      topics.forEach((topic, index) => {
-        topic.classList.toggle('active-topic', index === newIndex);
+      topics.forEach((topic) => {
+        topic.classList.toggle('active-topic', topic === activeTopic);
       });
 
       // Change image if needed
-      if (newIndex !== currentImageIndex) {
-        sideImage.style.opacity = 0;
-        setTimeout(() => {
-          sideImage.src = images[newIndex];
-          sideImage.style.opacity = 1;
-          currentImageIndex = newIndex;
-        }, 200);
+      if (activeTopic) {
+        const newImage = activeTopic.getAttribute('data-image');
+
+        if (newImage && currentImage !== newImage) {
+          sideImage.style.opacity = 0;
+
+          setTimeout(() => {
+            sideImage.src = newImage;
+            sideImage.style.opacity = 1;
+            currentImage = newImage;
+          }, 200);
+        }
       }
     }
 
     window.addEventListener('scroll', updateHighlight);
+
     // Trigger once on load
     updateHighlight();
   }

@@ -4,10 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Interactive Stats Lab</title>
+
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+
   <!-- Font Awesome CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+
   <style>
     #sideImage {
       transition: all 0.5s ease-in-out;
@@ -15,24 +18,29 @@
       height: auto;
       object-fit: contain;
     }
+
     #imageContainer, #textContent {
       transition: all 0.5s ease-in-out;
     }
+
     /* Topic highlighting */
     .topic {
       opacity: 0.35;
       transition: opacity 0.4s ease;
     }
+
     .topic.active-topic {
       opacity: 1;
     }
   </style>
 </head>
+
 <body class="flex font-sans">
 
   <!-- Sidebar -->
   <aside id="sidebar" class="bg-gray-800 text-white p-4 flex-shrink-0 transition-all duration-300 w-[140px] hover:w-64 sticky top-0 h-screen">
     <h2 class="text-2xl font-bold mb-6 hidden md:block">Menu</h2>
+
     <ul>
       <li class="mb-2">
         <a href="index.html" class="flex items-center py-2 px-2 rounded hover:bg-gray-700">
@@ -47,6 +55,7 @@
           <i class="fa-solid fa-book w-6 text-center"></i>
           <span class="ml-2 hidden md:inline">Learn ▼</span>
         </button>
+
         <ul id="learnSubmenu" class="ml-6 mt-2 hidden">
           <li><a href="bart.html" class="block py-1 px-2 rounded hover:bg-gray-700">>> BART and BART for Causal Inference</a></li>
           <li><a href="group.html" class="block py-1 px-2 rounded hover:bg-gray-700">>> Individual, Group, and Population Effects</a></li>
@@ -66,88 +75,136 @@
   <!-- Main content -->
   <main id="mainContent" class="flex-1 p-6 relative">
 
-    <!-- Persistent Show Menu Button -->
+    <!-- Menu Button -->
     <button id="showSidebar" class="fixed top-4 right-4 z-50 px-3 py-1 bg-gray-400 text-white rounded hover:bg-gray-500">
       ☰ Menu
     </button>
 
-    <!-- Big Header / Intro -->
-    <section id="home" class="mb-12">
-      <h1 class="text-4xl md:text-5xl font-bold mb-6">Individual, Group, and Population Effects</h1>
+    <!-- Header -->
+    <section class="mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold mb-6">Individual, Group and Population Effects</h1>
       <p class="text-lg md:text-xl text-gray-700 mb-8">
-        This section introduces the concepts of treatment effects at different levels. We’ll explore how effects vary across individuals, groups, and populations, and why these distinctions matter in causal inference.
+        This section introduces the concepts of treatment effects at different levels. <br><br>
+        Who do you want to know about? Who can you know best about with what you have? 
+        And how are you discussing and assuming about those new findings? <br><br>
+
+        We seriously reccomend the initial thinkCausal modules (Potential Outcomes, Causal Estimands, Estimands 2) 
+        before covering this one, as the content is most helpful after solidifying that knowledge. <br><br>
+
+        Note: <br>
+        Calculated ~ You can see both potential outcomes <br>
+        Estimated  ~ You can only see observed outcomes 
+
       </p>
     </section>
 
-    <!-- Blog section -->
-    <section id="blog" class="relative flex flex-col md:flex-row items-start">
+    <!-- Content -->
+    <section class="relative flex flex-col md:flex-row items-start">
 
-      <!-- Text content -->
+      <!-- TEXT -->
       <div id="textContent" class="md:w-2/3 space-y-12 text-lg">
-        <p class="topic" id="topic1">
-          <strong class="text-2xl">Introduction to Group Estimands</strong><br>
-          Here we discuss the implications of choice between Sample, Population, and Conditional treatment effects. 
-          Who do you want to know about? Who can you know best about with what you have? 
-          And how are you discussing and assuming about those new findings? <br><br>
-          
-          We seriously reccomend the initial thinkCausal modules (Potential Outcomes, Causal Estimands, Estimands 2) before covering this one, 
-          as the content is most helpful after solidifying that knowledge.
+
+        <p class="topic" data-image="assets/potential-outcomes.png">
+          <strong class="text-2xl">Individual Treatment Effect (ITE)</strong><br>
+          For an individual, we define your causal effect as the difference between your potential outcomes, Y1 and Y0. 
+          Remember that only one of these potential outcomes are realistically observed.<br><br>
+
+          Our example on the right shows the potential outcomes of 10 individuals. 
+          Some are observed, some are not. The length each dotted line, per individual, would be their causal effect,
+           or treatment effect in an experimental context. <br><br>
+
+          Let's say we gave Ada, an individual in a simple experiment, some treatment Z. 
+          We have observed Ada for their potential outcome <span style="color:#6d24da;font-weight: bold;">Y1 = Y(Z=1)</span>, but we will never be able to observe Ada's <span style="color:#5f5f5f;font-weight: bold;">Y0 = Y(Z=0)</span>,
+           or what Ada would have looked like if they had not been given the treatment. 
+          Therefore we cannot determine any individuals' causal effect without further assumptions. <br><br>
         </p>
 
-        <p class="topic" id="topic2">
+        <p class="topic" data-image="assets/ICEs-with-ATE.png">
+          <strong class="text-2xl">Average Treatment Effect (ATE)</strong><br>
+          The Average Treatment Effect is calculated from the average across all the individual treatment effects.<br><br>
+
+          In our image example previously, we calculated (as in, we see both potential outcomes), the length between the 
+          potential outcomes for each individual. In this plot, each individual has their own color, and the length of that bar
+          is the same length as the dotted line between those potential outcomes. It's easy to see here what the ATE is, as it is the 
+          black dashed line going across the graph- the average of those individual causal effects.<br><br>
+
+          Any definition of an average causal effect depends on who is being averaged over.
+
+        </p>
+
+        <p class="topic" data-image="assets/PATE-calc.png">
           <strong class="text-2xl">Population Average Treatment Effect (PATE)</strong><br>
           A population is defined by your question and its context; Who do you care to know about? <br><br>
+          
           Some people (like U.S. Census officials), care about the entire population of the United States. 
           They send out thousands of messages to get their best estimates of that group (people who live in the United States). 
-          Some people may care only about a city, a town, a school, or some other specific, well-defined group of people. <br><br>
+          Some people may care only about a city, a town, a school, or some other specific, well-defined group of people.<br><br>
+
+          We call that their population of interest. 
+          The entire group of people that they care to know about. 
+          Like with the U.S. Census survey, we cannot guarantee our population admits into to our experiment, and we also might not want them to. 
+          What is most practical is a random and representative sample of a large population, and work with them. <br><br>
+          Realistically, the people (or, more generally, experimental units) in a social or medical experiment are typically
+           not a random or representative sample of any known or well-understood population of inference. 
+          In fact, often the more well-tailored a sample is for making causal inferences for a given sample,
+           the less likely the sample is to be a random sample from, or representative of, a known population.<br><br>
+           
+          However the population average treatment effect (PATE) is often a goal in causal inference. 
+          If we expand our previous example to 100 individuals, and we only care about them, then the <span style="color:blue; font-weight: bold;">blue line</span> is the PATE. <br>
+
+          Sure, some individual effects are <span style="color:red;">negative</span>, some are <span style="color:#36b3b5;">positive</span>, but we can calculate the PATE knowing both counterfactuals. <br>
+
+          Estimation becomes doubly more difficult for getting the PATE. Usually we're gathering samples that we need to extrapolate from
+          given a model of the treatment effect given pre-treatment predictors.
+
+        </p>
+
+        <p class="topic" data-image="assets/SATE-calc.png">
+          <strong class="text-2xl">Sample Average Treatment Effect (SATE)</strong><br>
+          For an example of the SATE, say we didn't get all 100 individuals into our experiment (they're greyed out, and not taken into calculations).<br><br>
+
+          In the image on the right, the <span style="color:purple; font-weight: bold;">purple line</span> is then our definition of the Sample Average Treatment Effect, or SATE calculated.
+          We include a gray line across to show what the PATE still is, to show that these things often will be different. It should make sense
+          that not including everybody will give us a different calculation. <br><br>
+
+          If we took more and more random samples of our defined 100-individual population, the average of those SATEs calculated would eventually equal the PATE.
+          This is a nice property of the simple example given.
+
+
+        </p>
+
+        <p class="topic" data-image="assets/CATE-calc.png">
+          <strong class="text-2xl">Conditional Average Treatment Effect (CATE)</strong><br>
+          The conditional average treatment effect is the average of individual treatment effects across a well-defined subsets.
+           A nice way of introducing such an estimand is something like, "For those age ..."<br><br>
+
+           In our continuing example, we subset to the individuals who are aged 27. These are highlighted by <span style="color:#3dca5edf;">green lines</span>. 
+           On the attached plot are the Individual Causal Effect plots, like before, but only for those individuals. The CATE for those aged 27 is that <span style="color:orange">orange line</span>. <br><br>
           
-          We call that their population of interest. The entire group of people that they care to know about. 
-          Like with the U.S. Census survey, we cannot guarantee our population admits into to our experiment, 
-          and we also might not want them to. What is sometimes most practical is a random and representative sample of a large population, and work with them. <br><br>
-          
-          Realistically, the people (or, more generally, experimental units) in a social or medical
-          experiment are typically not a random or representative sample of any known or well-understood
-          population of inference. In fact, often the more well-tailored a sample is for making causal inferences for a given sample,
-          the less likely the sample is to be a random sample from, or representative of, a known population. <br><br>
-
-          However the population average treatment effect (PATE) is often a goal in causal inference.
         </p>
 
-        <p class="topic" id="topic3">
-          <strong class="text-2xl">Group-Level Effects (SATE)</strong><br>
-          Fusce scelerisque magna nec felis imperdiet, a fermentum lorem viverra. Sed id felis in mauris convallis.<br><br>
-          Aliquam erat volutpat. Sed euismod libero in tortor tristique, in tempus risus gravida.<br><br>
-          Morbi ut turpis non velit pretium vehicula. Nunc a orci eu urna volutpat cursus.
+        <p class="topic" data-image="assets/test3.png">
+          <strong class="text-2xl">Others You May Have Heard Of</strong><br>
+          CACE, LATE, ATT, ATC, ITT, etc. Depends on analysis done.
         </p>
 
-        <p class="topic" id="topic4">
-          <strong class="text-2xl">Population-Level Effects (PATE)</strong><br>
-          Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Mauris ut purus at leo vehicula.<br><br>
-          Curabitur et ligula non sapien dignissim elementum. Etiam a neque vel elit consequat tempor.<br><br>
-          Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+        <p class="topic" data-image="assets/test4.png">
+          <strong class="text-2xl">Summary</strong><br>
         </p>
 
-        <p class="topic" id="topic5">
-          <strong class="text-2xl">Summary and Next Steps</strong><br>
-          Curabitur mollis massa sed nulla efficitur, a hendrerit mauris tincidunt. Donec sit amet eros sit amet dolor vehicula blandit.<br><br>
-          Fusce ac metus ut sapien congue scelerisque. Praesent ut neque ac purus vehicula porttitor.<br><br>
-          Vivamus ac quam non nisi sollicitudin ultrices. Integer in metus et tortor efficitur bibendum. <br><br>
-          Extra line <br><br>
-          Extra extra line <br><br>
-          Final line
-        </p>
       </div>
 
-      <!-- Right-side image -->
+      <!-- IMAGE -->
       <div id="imageContainer" class="md:w-4/5 mt-6 md:mt-0 md:ml-6 flex justify-center sticky top-20">
-        <img id="sideImage" src="assets/PATE_formula.png" alt="PATE Formula is 1/N * Sum(Y_i(1) - Y_i(0), for all individuals i)" class="rounded shadow-lg max-w-full h-auto">
+        <img id="sideImage"
+             src="assets/PATE_formula.png"
+             class="rounded shadow-lg max-w-full h-auto">
       </div>
 
     </section>
 
   </main>
 
-  <!-- JS -->
   <script src="js/main.js"></script>
 </body>
 </html>
