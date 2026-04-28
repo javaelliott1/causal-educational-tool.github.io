@@ -12,10 +12,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
 
   <style>
-    /* Right-side image */
     #sideImage {
       transition: all 0.5s ease-in-out;
-      width: 100%;
       max-width: 100%;
       height: auto;
       object-fit: contain;
@@ -25,11 +23,12 @@
       transition: all 0.5s ease-in-out;
     }
 
-    /* Paragraph greyed out effect */
+    /* Topic highlighting */
     .topic {
       opacity: 0.35;
       transition: opacity 0.4s ease;
     }
+
     .topic.active-topic {
       opacity: 1;
     }
@@ -41,6 +40,7 @@
   <!-- Sidebar -->
   <aside id="sidebar" class="bg-gray-800 text-white p-4 flex-shrink-0 transition-all duration-300 w-[140px] hover:w-64 sticky top-0 h-screen">
     <h2 class="text-2xl font-bold mb-6 hidden md:block">Menu</h2>
+
     <ul>
       <li class="mb-2">
         <a href="index.html" class="flex items-center py-2 px-2 rounded hover:bg-gray-700">
@@ -49,12 +49,13 @@
         </a>
       </li>
 
-      <!-- Learn submenu -->
+      <!-- Learn section -->
       <li class="mb-2">
         <button id="learnToggle" class="flex items-center w-full text-left py-2 px-2 rounded hover:bg-gray-700">
           <i class="fa-solid fa-book w-6 text-center"></i>
           <span class="ml-2 hidden md:inline">Learn ▼</span>
         </button>
+
         <ul id="learnSubmenu" class="ml-6 mt-2 hidden">
           <li><a href="bart.html" class="block py-1 px-2 rounded hover:bg-gray-700">>> BART and BART for Causal Inference</a></li>
           <li><a href="group.html" class="block py-1 px-2 rounded hover:bg-gray-700">>> Individual, Group, and Population Effects</a></li>
@@ -74,76 +75,134 @@
   <!-- Main content -->
   <main id="mainContent" class="flex-1 p-6 relative">
 
-    <!-- Persistent Show Menu Button -->
+    <!-- Menu Button -->
     <button id="showSidebar" class="fixed top-4 right-4 z-50 px-3 py-1 bg-gray-400 text-white rounded hover:bg-gray-500">
       ☰ Menu
     </button>
 
     <!-- Header -->
-    <section id="home" class="mb-12">
-      <h1 class="text-4xl md:text-5xl font-bold mb-6">Causal and Predictive Language</h1>
+    <section class="mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold mb-6">Predictive vs. Causal Language</h1>
       <p class="text-lg md:text-xl text-gray-700 mb-8">
-        This section introduces the difference in interpreting results as causal or predictive, to help you understand how to properly discuss these topics.
+        This section introduces how to interpret interpret the results of statistical procedures and 
+        to effectively communicate this understanding to others. <br><br>
+
+        We seriously reccomend the initial thinkCausal modules and Individual, Group and Population Effects module
+        before covering this one, as the content is most helpful after solidifying that knowledge. <br><br>
       </p>
     </section>
 
-    <!-- Blog section -->
-    <section id="blog" class="relative flex flex-col md:flex-row items-start">
+    <!-- Content -->
+    <section class="relative flex flex-col md:flex-row items-start">
 
-      <!-- Text content -->
+      <!-- TEXT -->
       <div id="textContent" class="md:w-2/3 space-y-12 text-lg">
 
-        <p class="topic" id="topic1">
-          <strong class="text-2xl">Introduction to Causal Effects</strong><br>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque vel ligula id sapien elementum facilisis. Proin tincidunt purus nec lorem laoreet, sit amet tristique justo sodales.<br><br>
-          Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Curabitur finibus.<br><br>
-          Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.
+        <p class="topic" data-image="assets/xkcd-corr-cause.png">
+          <strong class="text-2xl">So Far, (not) So Good</strong><br>
+          The challenge in accurately conveying statistical results is amplified when the potential exists for 
+          results to be interpreted causally. As a result, various communication approaches have evolved over the 
+          years to guard against unwarranted causal interpretations. <br><br>
+          
+          Arguably, the most common strategy is to use the word “association” in situations where there is inadequate evidence for causal intent.
+          These wording choices, however, may be insufficient to prevent causal intent by the reader. <br><br>
+          
+          One reason for this is that there may be other linguistic signals in such a description that would still imply a causal 
+          connection. Another is that, even with careful wording, there is a strong proclivity in human reasoning 
+          towards causal attribution. <br><br>
         </p>
 
-        <p class="topic" id="topic2">
-          <strong class="text-2xl">Individual-Level Effects (CATE)</strong><br>
-          Suspendisse potenti. Phasellus et felis et erat tincidunt dapibus nec ac eros. Integer id sapien a sapien finibus accumsan.<br><br>
-          Mauris lacinia, nisl non bibendum fringilla, felis nisl tincidunt sapien, nec venenatis ligula purus a est.<br><br>
-          Cras sed justo sed libero sollicitudin. Nullam ac mauris ut neque eleifend convallis.
+        <p class="topic">
+          <strong class="text-2xl">Background</strong><br>
+          Why is it important for students to be able to distinguish between study results that provide evidence 
+          for a causal relationship versus those that are merely associational? The primary reason is that causal 
+          relationships can provide guidance for decision making in ways that associational evidence does not. <br><br>
+
+          For instance, if we know that there is an association between using an educational tool and subsequent 
+          test scores, it might be interesting to try to explain why that association is present. Are more prepared 
+          or confident students more likely to adopt the tool? Or is the tool adding value on its own? <br><br>
+          
+          If instead we knew the relationship were causal, then we might be moved to adopt this tool in the classroom. If 
+          we adopted the tool for more general use based on merely a positive association and the causal effect 
+          was in fact zero or negative, then this would be a waste of time and money and other scarce resources 
+          (e.g., teacher goodwill) in the educational system.
         </p>
 
-        <p class="topic" id="topic3">
-          <strong class="text-2xl">Group-Level Effects (SATE)</strong><br>
-          Fusce scelerisque magna nec felis imperdiet, a fermentum lorem viverra. Sed id felis in mauris convallis.<br><br>
-          Aliquam erat volutpat. Sed euismod libero in tortor tristique, in tempus risus gravida.<br><br>
-          Morbi ut turpis non velit pretium vehicula. Nunc a orci eu urna volutpat cursus.
+        <p class="topic">
+          <strong class="text-2xl">Using 'Associated with'</strong><br>
+          Our example finding might be summarized as a negative association between tool exposure and test score and be described in the following way: “The 
+          online tool was associated with a 20-point decrease in test scores.” <br><br>
+
+          What is wrong with this wording? It is a difference in the precise meanings of 'association' between statisticians and other 
+          fields. Also, the meaning we intend to have is often not sufficiently well understood by other audiences. 
+          Often 'association' has colloquial meanings that lean closer to causality, like in institutional or semi-formal language where
+          'association' is neutral but strongly implies involvement or responsibility. <br><br>
+
+          "He was found with associated individuals."<br>
+          "Items associated with the burglary were recovered."<br>
+          "They're associated with that crowd."<br><br>
+
+          Moreover, this interpretation also includes the word "decrease," and thus seems to imply that the 
+          tool use decreased test scores for students (on average) by 20 points. A logical implication of such a 
+          causal interpretation would be that if the students who used the reading tool had instead not used the 
+          tool, they would have scored an average of 20 points higher than what we observed at the end of the 
+          year. Such an interpretation, however, is not merited. <br><br>
         </p>
 
-        <p class="topic" id="topic4">
-          <strong class="text-2xl">Population-Level Effects (PATE)</strong><br>
-          Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Mauris ut purus at leo vehicula.<br><br>
-          Curabitur et ligula non sapien dignissim elementum. Etiam a neque vel elit consequat tempor.<br><br>
-          Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+        <p class="topic">
+          <strong class="text-2xl">Psychological Barriers</strong><br>
+          Psychologically, people are predisposed to these types of misinterpretations of the evidence due to the human tendency to make 
+          meaning of experiences through causal interpretations. <br><br>
+
+          Related work has demonstrated that people explain and predict behavior similarly to how they understand and tell stories; this requires 
+          understanding the sequence of events and making inferences about the mechanism behind each event. <br><br>
+
+          Depending on the magnitude of the impact of prior beliefs, it seems possible that even if non-causal study results are 
+          communicated clearly, the audience may still be inclined to interpret them causally if the causal 
+          conclusions are consistent with their prior beliefs. 
         </p>
 
-        <p class="topic" id="topic5">
-          <strong class="text-2xl">Summary and Next Steps</strong><br>
-          Curabitur mollis massa sed nulla efficitur, a hendrerit mauris tincidunt. Donec sit amet eros sit amet dolor vehicula blandit.<br><br>
-          Fusce ac metus ut sapien congue scelerisque. Praesent ut neque ac purus vehicula porttitor.<br><br>
-          Vivamus ac quam non nisi sollicitudin ultrices. Integer in metus et tortor efficitur bibendum.<br><br>
-          Extra line <br><br>
-          Extra extra line <br><br>
-          Final line
+        <p class="topic">
+          <strong class="text-2xl">Reccomended Interpretations</strong><br>
+          Using a college student anxiety and vaping example, <br><br>
+
+          <span style="font-weight:bold">Explicitly Not Causal:</span> <br>
+          Researchers found that college students who vaped regularly had 
+          higher levels of anxiety compared to those who didn’t vape. 
+          Skeptics argue that this difference in outcomes could be 
+          explained by the fact that students with higher levels of anxiety 
+          are more likely to decide to vape. <br><br>
+
+          Researchers found that college students who vaped regularly had 
+          higher levels of anxiety compared to those who didn't vape. It's 
+          possible that students who decided to vape had higher levels of 
+          anxiety when they made the decision to start vaping. <br><br>
+
+          <span style="font-weight:bold">Explicitly Causal:</span> <br>
+          Researchers have found that vaping caused an increase in anxiety 
+          levels among college students.<br><br>
+          Researchers have found that vaping led to an increase in anxiety 
+          levels among college students.<br><br> 
+
+        </p>
+
+        <p class="topic">
+          <strong class="text-2xl">Citations</strong><br>
+          Hill, J. Perrett, G., Hancock, S. Win, L. Bergner, Y.(2026) "Causal Language and Statistics Instruction: Evidence from a Randomized Experiment" <br>
+          thinkCausal | NYU PRIISM Center for Practice and Research at the Intersection of Information, Society, and Methodology (PRIISM)<br><br>
         </p>
 
       </div>
 
-      <!-- Right-side image -->
+      <!-- IMAGE -->
       <div id="imageContainer" class="md:w-4/5 mt-6 md:mt-0 md:ml-6 flex justify-center sticky top-20">
-        <img id="sideImage" src="assets/test.png" alt="Illustration" class="rounded shadow-lg">
+        <img id="sideImage" src="" class="rounded shadow-lg max-w-full h-auto">
       </div>
 
     </section>
 
   </main>
 
-  <!-- JS -->
   <script src="js/main.js"></script>
-
 </body>
 </html>
