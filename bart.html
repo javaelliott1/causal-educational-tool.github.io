@@ -94,17 +94,108 @@
       <!-- TEXT -->
       <div id="textContent" class="md:w-2/3 space-y-12 text-lg">
 
-        <p class="topic" data-image="assets/xkcd-corr-cause.png">
-          <strong class="text-2xl">Bayesian Inference</strong><br>
+        <p class="topic" data-image="assets/hypershoe-obs-data.png">
+          <strong class="text-2xl">Our Data Example</strong><br>
+          Let's consider a hypothetical example where you were given data from a recent running race with 200 runners.
+          Some of the runners wore the newly developed HyperShoes, while some of the runners wore standard shoes.
+          The treatment (<span style="color:#49c7de">wearing HyperShoes</span>) was not randomly assigned, runners choose for themselves which shoes to use.<br><br>
+          Besides the treatment variable Z (HyperShoes or standard shoes)
+            and outcome variable Y(running times), the dataset has measurements of age. <br><br>
+          How can we determine if wearing HyperShoes caused runners to run faster than they would have run had they worn standard shoes?
         </p>
 
-        <p class="topic">
+        <p class="topic" data-image="assets/tree_animation.gif">
           <strong class="text-2xl">Regression Trees</strong><br>
+          We're going to temporarily ignore the causal question for the sake of understanding regression trees. <br>
 
+          Regression trees are simple models that partition the data by finding the best splits.
+          A split is a rule based on one of the covariates (features), such as “is age < 40?” or “is Z = 1?”.
+          For example, a model like rpart(running_time ~ z + age) uses the variables z (treatment) and age to explain variation in running_time.<br><br>
+
+          Rather than fitting a single equation, a regression tree repeatedly splits the data into smaller groups. 
+          Within each group, it predicts the outcome using the average (mean) of the observed values in that group.<br><br>
+
+          Looking at the process step by step:<br>
+
+          Initial state: The model starts with points forming two rough lines. The available covariates are z (treatment) and age. <br><br>
+          First split: The model chooses the split that best reduces prediction error.
+           In this case, it splits on treatment (Z = 1 vs. Z = 0), dividing the data into two groups. We show this by color now being added to the graph.
+           Each group is then assigned a predicted value equal to its mean running time.<br><br>
+          Further splits: One split is usually not enough to capture the structure in the data. The model continues splitting. 
+          For example, now on age within each treatment group—creating smaller regions where the mean better approximates the data.<br><br>
+          Stopping: This process continues until a stopping rule is met. "Enough" can be controlled by parameters we set before running the model.<br><br>
+
+          Be warned! Regression trees are very prone to overfitting, as seen in the later images.
+          Those extra splits may improve fit on the data but usually harm performance on data we haven't seen yet.
+          At the same time, we do want enough flexibility to capture real nonlinear relationships. 
+          This creates a tradeoff: too few splits underfits, too many splits overfit.<br><br>
+
+          So we need something that can more automatically regulate how many splits a regression tree is allowed to make given the data.
+        </p>
+
+        <p class="topic" data-image="assets/gbm-plot.png">
+          <strong class="text-2xl">Additive Regression Trees</strong><br>
+          For a more flexible model (that fits non-linearities well) but also guards against overfitting, 
+          one improvement is Gradient Boosted Regression Trees. These models build many small regression trees. <br><br>
+
+          The idea is to add the contributions of each weak tree together, as a tree is 'boosted' by previous ones. <br><br>
+
+          The newly generalized trees are kept weak by setting the depth (number of splits) of the weak trees, number of weak trees, and with 
+          a shrinkage parameter that is multiplied to the fit of each tree (called a learning rate). 
+          Each of these three parameters are tunable and set with cross validation.<br><br>
+
+          How it works: <br>
+          1. Use the mean outcome as the prediction<br>
+          2. Fit a small tree to improve our prediction<br>
+          3. Look at the residuals from the model (what it could not explain)<br>
+          4. Fit another small tree on those residuals, multiplied by the learning rate (this slows down how fast the generalized tree is learning)<br>
+          5. Repeat (2-4), usually 75 - 150 times. This ends up looking like our previous single regression tree animation, but is different in methodology (for the better!). <br><br>
+
+          And this creates a much better fit to our data from the initial single regression tree. <br><br>
+
+          The issue is that this method depends a lot on cross validation that takes a lot of time, and left with single predictions without telling us how confident they were in that prediction.
+          So how can we do even better? Yes - with BART.
+
+        </p>
+
+        <p class="topic" data-image=""</p>
+          <strong class="text-2xl">Bayesian Inference</strong><br>
+          BART trades traditional hyperparameters found with cross-validation for Bayesian priors. 
+          Bayesian priors can be interpreted here as 'what are our prior beliefs about regression trees?' <br><br>
+
+          1. We should be skeptical about predictions far away from the general mean. In an example with which we had no other information, our best guess is the mean.
+          So we should be wary of extreme things as a sign of overfit. <br>
+
+          2. The weak trees should be pretty small (kept weak). <br>
+
+          3. Our model should be able to outperform a linear regression. With no traditional linear regression parametric assumptions, we can do better than a straight line. <br><br>
+
+          These verbal priors have to then be formed mechanically. 
+          With BART, they're calibrated from the data (meaning that its performs well at default).<br>
+          Priors, by importance:<br><br>
+          1. Prior on the Means. We want our predictions to be generally closer to the mean, so extreme predictions get pulled towards the mean. <br><br>
+
+          2  Prior on the Tree Depth. When a tree is proposed, it has a certain depth (number of cuts), and we believe we want more depth=2 or depth=3 than depth = 1 (no cuts) or depth = 4,5. 
+          This isn't a hard cut-off, it just needs to see a strong signal to delve deeper (which is nice about a Bayesian prior).<br><br>
+
+          3. Prior on the Standard Deviation. We'll fit a linear regression and look at its standard deviation. This prior pulls things such that we have a smaller standard deviation than linear regression (we should be doing better than it, after all).<br><br>
+          
+          Trees are proposed (tried out) and either accepted or rejected with a Metropolis-Hastings algorithm (based on gradual improvement). <br><br>
         </p>
 
         <p class="topic">
           <strong class="text-2xl">BART</strong><br>
+          This is where we 'put it all together'. <br><br>
+
+          Running a BART Model first scales the outcome, proposes a variety of general trees:<br><br>
+          1. What if we grow a new weak tree<br>
+          2. What if we prune an existing tree<br>
+          3. What if we flip an existing tree<br>
+          4. What if we add a new split on an existing tree<br>
+          Then BART accepts or rejects trees, such that we gradually improve performance. And repeats over many (thousands) of iterations! <br><br>
+
+          
+
         </p>
 
         <p class="topic">
