@@ -4,7 +4,7 @@ library(rpart)
 library(rpart.plot)
 library(gbm)
 library(bartCause)
-
+library(patchwork)
 
 "
 Let's consider a hypothetical example where you were given data from a recent running race with 200 runners.
@@ -238,13 +238,11 @@ faker.att |>
 
 
 ##BART
-bart <- bartCause::bartc(
-  response = y,
-  treatment = z,
-  confounders = age,
+
+bart <- dbarts::bart2(y ~ z + age,
   data = faker,
-  estimand = 'att',
-  keepTrees = TRUE
+  keepTrees = TRUE,
+  n.chains = 10
 )
 
 post <- predict(bart,newdata=faker)
@@ -252,7 +250,7 @@ bart_yhat <-     post |> colMeans()
 bart_yhat.min <- post |> apply(2,quantile,c(0.025))
 bart_yhat.max <- post |> apply(2,quantile,c(0.975))
 
-faker |> 
+p.bart.1 <- faker |> 
   mutate(
     yhat = bart_yhat,
     yhat.min = bart_yhat.min,
@@ -271,12 +269,37 @@ faker |>
   )
 
 
-tmp <- post[1,]
+tmp <- post[sample(1:5000,size=10),] |> 
+  as.data.frame() |> 
+  t()
+colnames(tmp) <- paste0('V',1:10)
 
-faker |> 
-  mutate(
-    line = tmp
-  ) |>
+p.bart.2 <- faker |>
+  bind_cols(tmp) |> 
   ggplot() + 
-  geom_point(aes(x=age,y=y,color=as.factor(z))) + 
-  geom_line(aes(x=age,y=tmp,group=z))
+  geom_point(aes(x=age,y=y,color=as.factor(z)),alpha=0.5) + 
+  geom_line(aes(x=age,y=V1,group=z)) + 
+  geom_line(aes(x=age,y=V2,group=z)) + 
+  geom_line(aes(x=age,y=V3,group=z)) + 
+  geom_line(aes(x=age,y=V4,group=z)) + 
+  geom_line(aes(x=age,y=V5,group=z)) + 
+  geom_line(aes(x=age,y=V6,group=z)) + 
+  geom_line(aes(x=age,y=V7,group=z)) + 
+  geom_line(aes(x=age,y=V8,group=z)) + 
+  geom_line(aes(x=age,y=V9,group=z)) + 
+  geom_line(aes(x=age,y=V10,group=z)) +
+  theme_minimal() + 
+  labs(
+    x = 'Age',
+    y = 'Running Time',
+    color = 'Treated',
+    title = 'BART Produces Multiple Fit Instances',
+    subtitle = 'These get aggregated over as a mean estimate and uncertainty'
+  )
+
+
+p.bart.2 / p.bart.1
+
+
+
+#bart for causal
