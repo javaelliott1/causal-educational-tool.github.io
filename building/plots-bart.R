@@ -256,6 +256,7 @@ p.bart.1 <- faker |>
     yhat.min = bart_yhat.min,
     yhat.max = bart_yhat.max
   ) |> 
+  filter(age <= 50) |> 
   ggplot() + 
   geom_point(aes(x=age,y=y,color=as.factor(z)),alpha=0.5) + 
   geom_ribbon(aes(x=age,y=y,ymin=yhat.min,ymax=yhat.max,group=as.factor(z)),alpha=0.5) + 
@@ -276,6 +277,7 @@ colnames(tmp) <- paste0('V',1:10)
 
 p.bart.2 <- faker |>
   bind_cols(tmp) |> 
+  filter(age <=50) |> 
   ggplot() + 
   geom_point(aes(x=age,y=y,color=as.factor(z)),alpha=0.5) + 
   geom_line(aes(x=age,y=V1,group=z)) + 
@@ -300,6 +302,15 @@ p.bart.2 <- faker |>
 
 p.bart.2 / p.bart.1
 
-
-
 #bart for causal
+
+faker |> 
+  ggplot(aes(x=age,y=y,color=as.factor(z))) + 
+  geom_point() + 
+  theme_minimal() + 
+  labs(
+    x = 'Age',
+    y = 'Running Time',
+    color = 'Treated',
+    title = 'Our Observed Data'
+  )

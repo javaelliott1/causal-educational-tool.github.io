@@ -194,12 +194,119 @@
           4. What if we add a new split on an existing tree<br>
           Then BART accepts or rejects trees, such that we gradually improve performance. And repeats over many (thousands) of iterations! <br><br>
 
-          
+          <span style="font-weight:bold">Using BART</span> <br><br>
+            For recreating plots or playing with your own data for predictive reasons, we reccomend the dbarts R library with the bart2 function. <br>
+            e.g.) fit <- bart2(y ~ covariate + covariate,data=runners)<br><br>
+
+            For unseen data, we reccomend using the posterior predictive distribution as it makes our estimates more uncertain. <br><br>
+
+          <span style="font-weight:bold">Partial Pooling</span> <br><br>
+            Sometimes we want to use more sophisticated models. Say that we also, in our data, tracked which country these runners came from. <br><br>
+            We can extend the BART framework to accomodate for countries in new data from countries we haven't seen before. 
+            Traditional models are stuck because if we modelled country as a fixed factor, and got a person from a new country, the traditional model doesn't 
+            know how to account for that. <br><br>
+            
+            The stan4bart package in R is best for "Partial Pooling", where as in this example it would treat each country as having its own 'population'. 
+            Here, stan4bart gets around that 'stuckness' by modeling the variance across countries than each countries means. 
+            That way, when a new country appears that stan4bart needs to predict, it doesn't change anything about implementation. (i.e., it does not need to be seen in the training data)<br><br>
+            
+            Why use Partial Pooling? <br>
+            * accounts for unseen future groups <br>
+            * non-independent and identically distributed observations <br>
+            * more regularization <br>
+            * improved predictions assuming independence<br>
+            * more efficient assuming independence<br><br>
+
+            (link to stan4bart paper)
+
+          Since this has been so far a predictive problem, we've treated z like a covariate and only have been interested in predicting data well.
+        </p>
+
+        <p class="topic" data-image="assets/hypershoe-causal-obs-data.png">
+          <strong class="text-2xl">BART for Causal Inference</strong><br>
+          Let's return to a causal framework. Recall that we wanted to determine if wearing HyperShoes caused runners to run faster than they would have run had they worn standard shoes. <br>
+          We'll also expand our data to a larger age range, but we only observe people over 50 without the hyperShoe. 
+          We'll also make new data points so this feels a little different than the predictive section, but looks the same. <br><br>
+
+          <span style="font-weight:bold">Choosing an Estimand</span> <br><br>
+          In this example, we’ll be estimating the effect of the treatment on the treated, or ATT. 
+          It appears that every runner under and up to 50 wore HyperShoes. 
+          Without runners older than 50 in the treatment group,
+           we don’t have enough available information to infer about counterfactuals for the average treatment effect (ATE)
+          or the effect of the treatment on the controls (ATC) 
+          but we do have complete overlap for the ATT,
+          and we have enough information to infer about what would have happened if those participants had not worn HyperShoes! <br><br>
+
+          In a completely randomized experiment (where everyone has the same probability of receiving the treatment) the ATE, ATT and ATC are expected to be the same because there are no systematic differences between the treatment and control groups. <br>
+          So whether we average individual level treatment effects over the treatment group or the control group or the whole sample shouldn't make a difference (in expectation). 
+          This is not the case for observational studies where the ATE, ATT and ATC can be different. 
+          This is because in observational studies, the participants in the treatment group and participants in the control group can look very different from one another. <br><br>
 
         </p>
 
-        <p class="topic">
-          <strong class="text-2xl">BART for Causal Inference</strong><br>
+        <p class="topic" data-image="assets/hypershoe-bal-plot.png">
+          <strong class="text-2xl">Imbalance</strong><br>
+          In observational studies, 
+          the treatment is not randomly assigned and we no longer expect covariates to be balanced between the treatment and control group.
+           So it's not surprising in this study that on average, runners in the treatment group are about 14 years younger than the runners in the control group. <br><br>
+
+           We will need to rely on a statistical model to correct this imbalance or else the substantial difference in age will bias our estimate of the ATT.
+
+          <br>
+        </p>
+
+        <p class="topic" data-image="assets/suspend-disbelief.png">
+          <strong class="text-2xl">Suspending Disbelief to View Potential Outcomes</strong><br>
+          Before we begin analyzing our observational data, let's suspend belief and see what our results would look like if we had access to each runner's factual and counterfactual outcomes.
+          With all potential outcomes, we can calculate each runner's true individual causal effect (ICE).
+          In this plot we also can see that age is linearly related to running times. 
+          Each runner's ICE is shown as a black line. 
+          Keep in mind that because we are interested in the ATT, we only need to predict the counterfactuals of runners in the treatment group!<br><br>
+          
+          Unfortunately, in practice we never have access to all potential outcomes and can never make this calculation. 
+          But in order to understand the properties of our estimators we need to be able to understand how they will perform in circumstances
+           where we know the truth and the assumptions are satisfied. 
+          When we suspend disbelief and have access to all potential outcomes,
+           we can calculate the true ATT of our sample by taking the average of all the individual causal effects for runners who received the treatment (wore HyperShoes) in the real world.<br><br>
+        </p>
+
+        <p class="topic" data-image="assets/causal-ices.png">
+          <strong class="text-2xl">Calculating True ATT</strong><br>
+          When we average the individual causal effects of all the runners in the treatment group,
+           we can see that the true ATT from our sample is -55.16. This is the true ATT that we will be attempting to estimate.
+          Now we will return to reality where we only have access to our observed data and need to estimate the ATT. <br><br><br><br>
+        </p>
+
+        <p class="topic" data-image="assets/diff-in-means-estimate.png">
+          <strong class="text-2xl">Difference in Means</strong><br>
+          If we use the difference in means as our statistical model,
+           our estimate would be -12.6 which is extremely far from true ATT!
+          The story is the same as the last time we used comparing the difference in means to estimate the ATT,
+           we are still not incorporating any information about age and the imbalance of age has not been accounted for.
+          Not appropriately adjusting for the confounding variable of age explains why the estimated ATT is so biased.<br><br><br><br>
+
+        </p>
+
+         <p class="topic" data-image="assets/lm-estimates.png">
+          <strong class="text-2xl">Linear Regression</strong><br>
+          When the relationships between covariates and the outcome are non-linear,
+           the linear regression estimate for the ATT is likely to be biased.<br>
+          In our situation the estimate is -51.8 which is noticeably different from the true ATT!
+          While linear regression attempts to account for the imbalance of age,
+           the model simply doesn't fit the data well and thus can't provide a good prediction of the counterfactual state!<br><br>
+
+          Linear regression assumes that the relationships between predictors and the response are linear. 
+          When the treatment is not randomly assigned we can no longer expect balance between groups and need to rely more on our statistical model.
+          In the case of linear regression, this means leaning on the assumption that relationships are linear which may or may not be true!
+          When this assumption is not true, estimates from a linear regression are likely to be biased.
+          This assumption is less of a problem when the treatment is randomly assigned and we'll have a new module coming soon that explains why.<br><br>
+
+          In our current observational study, it is tempting to think about transforming the data,
+           adding polynomial terms or adding interactions to the regression to improve the fit.
+          While this might work once in a while when only a few predictors are involved,
+           in practice this is not a sustainable solution.
+          Imagine if we had 10, 20 or even 200 confounders we needed to account for!
+          Identifying which variables need to be transformed or which interaction term would need to be added would quickly become impossible.
         </p>
 
         <p class="topic">
