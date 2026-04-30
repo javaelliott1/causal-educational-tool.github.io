@@ -162,7 +162,7 @@ dat.cate.filt<- dat.cate |>
 
 p.cate.calc <- dat.cate.filt |> 
   ggplot() + 
-  geom_col(aes(x=id,y=ICE,fill = pos)) + 
+  geom_point(aes(x=id,y=ICE,color = pos),size=3) + 
   geom_hline(aes(yintercept= 0),color='black',lty='dashed') + 
   geom_hline(aes(yintercept= mean(ICE)),linewidth=2,color='#f38123') + 
   scale_fill_manual(

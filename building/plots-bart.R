@@ -68,7 +68,8 @@ p.2 <- faker.att |>
     x = "Age",
     y = "Running Time",
     color = 'Treated',
-    title = 'Our Observed Data'
+    title = 'Our Observed Data',
+    subtitle = 'One Split'
   )
 
 p.3 <- faker.att |> 
@@ -83,7 +84,8 @@ p.3 <- faker.att |>
     x = "Age",
     y = "Running Time",
     color = 'Treated',
-    title = 'Our Observed Data'
+    title = 'Our Observed Data',
+    subtitle = 'Only Another Split'
   )
 
 p.4 <- faker.att |> 
@@ -106,7 +108,8 @@ p.4 <- faker.att |>
     x = "Age",
     y = "Running Time",
     color = 'Treated',
-    title = 'Our Observed Data'
+    title = 'Our Observed Data',
+    subtitle = 'Simple Regression Tree'
   )
 
 
@@ -147,7 +150,8 @@ p.5 <- faker.att |>
     x = "Age",
     y = "Running Time",
     color = 'Treated',
-    title = 'Our Observed Data'
+    title = 'Our Observed Data',
+    subtitle = 'Larger Regression Tree'
   )
 
 p.6 <- faker.att |> 
@@ -188,7 +192,8 @@ p.6 <- faker.att |>
     x = "Age",
     y = "Running Time",
     color = 'Treated',
-    title = 'Our Observed Data'
+    title = 'Our Observed Data',
+    subtitle = 'Overfitting Regression Tree'
   )
 
 
@@ -204,7 +209,7 @@ for (p in plots) {
 dev.off()
 
 # Animate
-gif <- image_animate(imgs, fps = 1)
+gif <- image_animate(imgs, fps = 1,delay = 200)
 
 # Save final GIF
 image_write(gif, "assets/tree_animation.gif")
