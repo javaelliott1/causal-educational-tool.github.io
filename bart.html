@@ -229,10 +229,10 @@
           We'll also make new data points so this feels a little different than the predictive section, but looks the same. <br><br>
 
           <span style="font-weight:bold">Choosing an Estimand</span> <br><br>
-          In this example, we’ll be estimating the effect of the treatment on the treated, or ATT. 
+          In this example, we'll be estimating the effect of the treatment on the treated, or ATT. 
           It appears that every runner under and up to 50 wore HyperShoes. 
           Without runners older than 50 in the treatment group,
-           we don’t have enough available information to infer about counterfactuals for the average treatment effect (ATE)
+           we don't have enough available information to infer about counterfactuals for the average treatment effect (ATE)
           or the effect of the treatment on the controls (ATC) 
           but we do have complete overlap for the ATT,
           and we have enough information to infer about what would have happened if those participants had not worn HyperShoes! <br><br>
@@ -247,7 +247,7 @@
         <p class="topic" data-image="assets/hypershoe-bal-plot.png">
           <strong class="text-2xl">Imbalance</strong><br>
           In observational studies, 
-          the treatment is not randomly assigned and we no longer expect covariates to be balanced between the treatment and control group.
+          the treatment is not randomly assigned and we no longer expect covariates to be balanced <span style="font-style: italic;">in expectation</span> between the treatment and control group.
            So it's not surprising in this study that on average, runners in the treatment group are about 14 years younger than the runners in the control group. <br><br>
 
            We will need to rely on a statistical model to correct this imbalance or else the substantial difference in age will bias our estimate of the ATT.
@@ -288,7 +288,7 @@
         </p>
 
          <p class="topic" data-image="assets/lm-estimates.png">
-          <strong class="text-2xl">Linear Regression</strong><br>
+          <strong class="text-2xl">Regression with All Confounders</strong><br>
           When the relationships between covariates and the outcome are non-linear,
            the linear regression estimate for the ATT is likely to be biased.<br>
           In our situation the estimate is -51.8 which is noticeably different from the true ATT!
@@ -309,8 +309,32 @@
           Identifying which variables need to be transformed or which interaction term would need to be added would quickly become impossible.
         </p>
 
-        <p class="topic">
-          <strong class="text-2xl">Summary</strong><br>
+        <p class="topic" data-image="assets/bart-att.png">
+          <strong class="text-2xl">BART with All Confounders</strong><br>
+          BART does not assume the relationship between the covariates and the response are linear.
+          The BART estimate of the ATT is -44.45 which is the closest!<br><br>
+
+          The BART algorithm automatically learns about any non-linearities and accounts for these and for complex interactions between variables.
+          Unlike linear regression and difference in means estimation of causal effects,
+           the standard approach to BART for causal inference limits its inference to the part of the sample we are attempting to make inferences about
+           and this decision is generally based on properties of the sample such as overlap.<br><br>
+
+          For instance in our example our BART model is only modeling the causal effect for the treatment group.
+          This is because we are estimating the ATT and we limited our inference to the ATT because of overlap issues!<br><br>
+          In contrast, the standard difference-in-means and linear-regression estimates for the ATE, ATT and ATC are the same.
+          BART is able to identify that causal effects for the group of people that received the treatment may be drastically different 
+          than the group that received the control!<br><br>
+          
+          Remember that BART is not magic.
+          When the treatment is not randomly assigned,
+           BART assumes that all confounders are included in the model! <br><br>
+
+          <span style="font-weight:bold">Other Assumptions BART Makes</span> <br><br>
+          If we make the following structural assumptions:<br>
+          * Ignorability (all confounders measured)<br>
+          * SUTVA (No spillover and same version of treatment)<br>
+          * Overlap (In covariate space we see both treated and controls)<br><br>
+          
         </p>
 
         <p class="topic">

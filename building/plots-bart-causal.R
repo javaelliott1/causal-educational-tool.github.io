@@ -43,8 +43,6 @@ dat |>
   ) + 
   theme_minimal()
 
-
-
 dat |> 
   mutate(
     obs.y1 = ifelse(z == 1,'Y','N'),
@@ -67,7 +65,10 @@ dat |>
     subtitle = 'We would calculate the individual causal effect for each person if we could'
   )
 
+dat.att <- dat |> filter(age <= 50)
+
 dat |> 
+  filter(z==1) |> 
   mutate(
     ICE = y1 - y0
   ) |> 
@@ -78,7 +79,7 @@ dat |>
   labs(
     x = '',
     y = 'Individual Causal Effect',
-    title = paste0('Average Causal Effect of ',round(mean(dat$y1 - dat$y0),2)),
+    title = paste0('Average Causal Effect of ',round(mean(dat[dat$z==1,]$y1 - dat[dat$z==1,]$y0),2)),
     subtitle = 'We would never be able to see this in the real world'
   ) + 
   theme(axis.text.x = element_blank())
@@ -109,7 +110,7 @@ dat |>
     y = 'Running Times',
     color = 'Treated',
     title = paste0('Difference in Means estimates -75 with CI (-84.95,-65.05)'),
-    subtitle = 'True ATT is -59.12'
+    subtitle = 'True ATT is -45.19'
   )
 
 
@@ -127,5 +128,52 @@ dat |>
     y = 'Running Time',
     color = 'Treated',
     title = paste0('Linear Regression estimates -51.8 with CI (-56.41,-47.196)'),
-    subtitle = 'True ATT is -59.12'
+    subtitle = 'True ATT is -45.19'
+  )
+
+
+#bart
+m.bart <- bartc(
+  response = y,
+  treatment = z,
+  confounders = age,
+  estimand = 'att',
+  data = dat, 
+  keepTrees =TRUE
+)
+
+summary(m.bart,target='sate')
+yhat <- predict(m.bart,newdata=dat) |> colMeans()
+
+fake.yhats <- predict(m.bart,
+  newdata= tibble(
+    age = rep(c(18:50),times=2),
+    z = rep(c(0,1),each=33)
+  )
+)
+
+plotting_points <- tibble(
+    age = rep(c(18:50),times=2),
+    z = rep(c(0,1),each=33)
+  ) |> 
+  mutate(yhat = colMeans(fake.yhats)) |> 
+  group_by(age,z) |> reframe(yhat) |> 
+  pivot_wider(
+    names_from = z,
+    values_from = yhat,
+    names_prefix = 'yhat.z'
+  ) |> filter(between(age,20,49))
+
+
+dat |>
+  ggplot(aes(x=age,y=y)) + 
+  geom_point(aes(color=as.factor(z)),alpha=0.6) + 
+  geom_line(aes(x=age,y=yhat,color=as.factor(z)),data=dat |> mutate(yhat = yhat)) + 
+  geom_segment(aes(x=age,xend=age,y =yhat.z0,yend=yhat.z1),data=plotting_points) + 
+  theme_minimal() + labs(
+    x = 'Age',
+    y = 'Running Times',
+    color = 'Treated',
+    title = 'ATT Estimated -44.45 with CI (-46.09,-42.8)',
+    subtitle = 'True ATT -45.19'
   )
